@@ -6,3 +6,12 @@ class ProductoSerializer(serializers.ModelSerializer):
         model = Producto
         fields = '__all__'
 
+class ProductoUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'precio']
+
+class ProductoStockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = ['stock']

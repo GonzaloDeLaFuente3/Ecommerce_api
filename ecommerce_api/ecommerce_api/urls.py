@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from apps.producto import api as api_producto
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/v1/', include('ecommerce_api.router')),
+    #path('api/v1/producto/<int:pk>/modificar_stock/', api_producto.ProductoViewSet.as_view({'patch': 'modificar_stock'})),
 ]

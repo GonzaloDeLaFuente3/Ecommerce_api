@@ -15,7 +15,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
     # no me salio todavia
     @action(detail=True, methods=['patch'])
     def modificar_stock(self, request, pk=None):
-        producto = get_object_or_404(pk)
+        producto = get_object_or_404(Producto, pk=pk)
         serializer = ProductoStockSerializer(producto, data=request.data, partial=True)
         if serializer.is_valid():
             # user.set_password(serializer.validated_data['password'])

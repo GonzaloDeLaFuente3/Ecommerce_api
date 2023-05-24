@@ -20,5 +20,5 @@ from apps.producto import api as api_producto
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/v1/', include('ecommerce_api.router')),
-    #path('api/v1/producto/<int:pk>/modificar_stock/', api_producto.ProductoViewSet.as_view({'patch': 'modificar_stock'})),
+
 ]

@@ -1,5 +1,11 @@
+
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.response import Response
+
 from .models import Orden, DetalleOrden
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from .serializers import OrdenSerializer, DetalleOrdenSerializer
 
 
@@ -9,28 +15,65 @@ class OrdenViewSet(viewsets.ModelViewSet):
     queryset = Orden.objects.all()
     serializer_class = OrdenSerializer
 
-class DetalleOrdenViewSet(viewsets.ModelViewSet):
+
+class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin, viewsets.GenericViewSet):
     queryset = DetalleOrden.objects.all()
     serializer_class = DetalleOrdenSerializer
 
-# class DetalleOrdenViewSet(APIView):
-#     # Obtener
-#     def get(self, request, pk, format=None):
-#         persona = get_object_or_404(DetalleOrden.objects.all(), pk=pk)
-#         serializer = PersonaSerializer(persona)
-#         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        # controlar que no se registren mas de 1 unidad de tipo-asistencia del tipo="comida"
+        producto = serializer.validated_data.get('producto', None)
+        cantidad = serializer.validated_data.get('cantidad', None)
+
+        if cantidad >= producto.stock:
+            raise ValidationError('No hay stock suficiente')
+        else:
+            producto.stock -= cantidad
+            producto.save()
+            super().perform_create(serializer)
+
+
+
 #
-#     # Modificar
-#     def put(self, request, pk, format=None):
-#         persona = get_object_or_404(Persona.objects.all(), pk=pk)
-#         serializer = PersonaSerializer(persona, data=request.data)
-#         if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Modificar
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        # Verificar y actualizar el stock en Producto
+        nueva_cantidad = serializer.validated_data.get('cantidad', None)
+        if nueva_cantidad is not None:
+            producto = instance.producto
+            cantidad_anterior = instance.cantidad
+
+            if nueva_cantidad > (producto.stock + cantidad_anterior):
+                return Response({'error': 'La cantidad no puede ser mayor al stock disponible.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            bandera = False
+            if nueva_cantidad > cantidad_anterior:
+                bandera = True
+            if bandera:
+                #aumenta
+                producto.stock -= (nueva_cantidad - cantidad_anterior)
+                producto.save()
+            else:
+                #disminuye
+                producto.stock += (cantidad_anterior - nueva_cantidad)
+                producto.save()
+
+        super().update(request, *args, **kwargs)
+
+        return Response(serializer.data)
+
+
+
+
 #
-#     #Eliminar
-#     def delete(self, request, pk, format=None):
-#         persona = get_object_or_404(Persona.objects.all(), pk=pk)
-#         persona.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+    #Eliminar
+    def delete(self, request, pk, format=None):
+        detalle_orden = get_object_or_404(DetalleOrden.objects.all(), pk=pk)
+        detalle_orden.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,5 +1,4 @@
 
-from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from .models import Orden, DetalleOrden
@@ -16,16 +15,18 @@ class OrdenViewSet(viewsets.ModelViewSet):
     queryset = Orden.objects.all()
     serializer_class = OrdenSerializer
 
-    # convocar al metodo get_total, obtener el total y luego cuando lo quiera obtener en dolares
-    # lo envio y hago las comparaciones, etc...
     @action(detail=True, methods=['get'])
     def get_total_usd(self, request, pk=None):
         orden = get_object_or_404(Orden, pk=pk)
         total = orden.get_total()
         response = requests.get('https://www.dolarsi.com/api/api.php?type=valoresprincipales')
-        total_usd = total / (float(response.json()[1]["casa"]["venta"].replace(',','.')))
+        # Obtenemos la informacion del dólar blue
+        nombre = response.json()[1]["casa"]["nombre"]
+        precio = response.json()[1]["casa"]["venta"]
 
-        return Response({'precio_usd':round(total_usd,2)})
+        precio_usd = total / (float(response.json()[1]["casa"]["venta"].replace(',','.')))
+        # mostrar el precio usd en un json
+        return Response({'Nombre':nombre,'Precio':round(precio_usd,2)})
 
 
 class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin, viewsets.GenericViewSet):
@@ -37,8 +38,6 @@ class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, 
         producto = serializer.validated_data.get('producto', None)
         cantidad = serializer.validated_data.get('cantidad', None)
         orden = serializer.validated_data.get('orden', None)
-        # para pedidos no utlicé self.queryset porque se
-        # quedaba guardada la queryset anterior y no funcionaba bien
         pedidos = DetalleOrden.objects.all()
 
         # VALIDACIONES: Cualquier validacion que no se cumpla

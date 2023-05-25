@@ -16,7 +16,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
         producto = get_object_or_404(Producto, pk=pk)
         serializer = ProductoStockSerializer(producto, data=request.data, partial=True)
         if serializer.is_valid():
-            # user.set_password(serializer.validated_data['password'])
             serializer.save()
             return Response({'status': 'stock updated'})
         else:

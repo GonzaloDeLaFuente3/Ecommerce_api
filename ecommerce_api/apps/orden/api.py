@@ -3,15 +3,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
-
 from .models import Orden, DetalleOrden
 from rest_framework import viewsets, permissions, status
+from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import ValidationError
+from rest_framework import viewsets, permissions
 from .serializers import OrdenSerializer, DetalleOrdenSerializer
 
 
 class OrdenViewSet(viewsets.ModelViewSet):
-
-
     queryset = Orden.objects.all()
     serializer_class = OrdenSerializer
 
@@ -22,11 +22,10 @@ class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, 
 
 
     def perform_create(self, serializer):
-        # controlar que no se registren mas de 1 unidad de tipo-asistencia del tipo="comida"
         producto = serializer.validated_data.get('producto', None)
         cantidad = serializer.validated_data.get('cantidad', None)
 
-        if cantidad >= producto.stock:
+        if cantidad > producto.stock or cantidad <= 0:
             raise ValidationError('No hay stock suficiente')
         else:
             producto.stock -= cantidad
@@ -34,8 +33,6 @@ class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, 
             super().perform_create(serializer)
 
 
-
-#
     # Modificar
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -69,11 +66,9 @@ class DetalleOrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, 
         return Response(serializer.data)
 
 
-
-
-#
-    #Eliminar
+    #Eliminar, falta modificacion
     def delete(self, request, pk, format=None):
         detalle_orden = get_object_or_404(DetalleOrden.objects.all(), pk=pk)
         detalle_orden.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+

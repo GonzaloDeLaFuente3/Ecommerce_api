@@ -15,5 +15,5 @@ class Orden(models.Model):
 
 class DetalleOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='detalles_orden')
-    cantidad = models.DecimalField(max_digits=8, decimal_places=2)
+    cantidad = models.IntegerField()
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles_productos')

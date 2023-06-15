@@ -8,3 +8,5 @@ django-filter==21.1
 
 requests==2.27.1
 
+pytest == 7.1.1
+pytest-django==4.5.2

@@ -11,7 +11,7 @@ class Orden(models.Model):
     fecha_hora = models.DateTimeField(default=datetime.today)
 
     def get_total(self):
-        total = 0
+        total = 0.0
         detalle_ordenes = DetalleOrden.objects.all()
         for detalle_orden in detalle_ordenes:
             if detalle_orden.orden == self:
@@ -22,5 +22,5 @@ class Orden(models.Model):
 
 class DetalleOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='detalles_orden')
-    cantidad = models.IntegerField()
+    cantidad = models.FloatField()
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles_productos')

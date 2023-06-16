@@ -1,5 +1,7 @@
-from Ecommerce_api.ecommerce_api.apps.orden.models import Orden, DetalleOrden
-from Ecommerce_api.ecommerce_api.apps.producto.models import Producto
+import pytest
+
+from apps.orden.models import Orden, DetalleOrden
+from apps.producto.models import Producto
 
 
 def crear_orden(fecha):
@@ -19,9 +21,3 @@ def crear_producto(nombre, precio, stock):
     )
     return producto
 
-def crear_detalle_orden (orden:Orden, cantidad, producto:Producto):
-    detalle_orden = DetalleOrden.objects.get_or_create(
-        orden=orden,
-        cantidad=cantidad,
-        producto=producto
-    )

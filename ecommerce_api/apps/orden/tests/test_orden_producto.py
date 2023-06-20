@@ -96,4 +96,24 @@ def test_api_get_total_orden(crear_orden,crear_productos):
     assert total_obtenido == total_esperado
 
 # 8. Verificar que el método get_total_detalle de un detalle de orden, devuelve el valor
-# correcto de acuerdo a al precio del producto y cantidad de la orden.
+# correcto de acuerdo al precio del producto y cantidad de la orden.
+
+@pytest.mark.django_db
+def test_api_get_total_detalle_orden(crear_orden,crear_productos):
+    orden = crear_orden
+    producto1, producto2 = crear_productos
+
+    # Crear instancias de DetalleOrden y asociarlas a la Orden
+    detalle_orden1 = DetalleOrden.objects.create(orden=orden, cantidad=40, producto=producto1)
+    detalle_orden2 = DetalleOrden.objects.create(orden=orden, cantidad=60, producto=producto2)
+
+    # Calcular el total esperado
+    total_detalle_esperado = detalle_orden1.producto.precio * detalle_orden1.cantidad
+
+    # Obtener el total utilizando el método get_total_detalle() del detalle de la Orden
+    total_detalle_obtenido = detalle_orden1.get_total_detalle()
+
+    # Verificar que el total obtenido es igual al total esperado
+    assert total_detalle_obtenido == total_detalle_esperado
+    # Verificar que no se cumple que el total del detalle orden 2 es el mismo que el valor esperado del 1
+    assert not detalle_orden2.get_total_detalle() == total_detalle_esperado

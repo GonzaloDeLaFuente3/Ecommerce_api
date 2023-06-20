@@ -13,7 +13,7 @@ class Orden(models.Model):
     def get_total(self):
         total = 0.0
         for detalle_orden in DetalleOrden.objects.filter(orden=self):
-            total += detalle_orden.producto.precio * detalle_orden.cantidad
+            total += detalle_orden.get_total_detalle()
 
         return total
 
@@ -22,3 +22,7 @@ class DetalleOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='detalles_orden')
     cantidad = models.FloatField()
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='detalles_productos')
+
+    def get_total_detalle(self):
+        total = self.producto.precio * self.cantidad
+        return total

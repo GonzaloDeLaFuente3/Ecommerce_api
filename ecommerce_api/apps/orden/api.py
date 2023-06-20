@@ -11,9 +11,18 @@ from rest_framework import viewsets, permissions
 from .serializers import OrdenSerializer, DetalleOrdenSerializer
 
 
-class OrdenViewSet(viewsets.ModelViewSet):
+class OrdenViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin, viewsets.GenericViewSet):
     queryset = Orden.objects.all()
     serializer_class = OrdenSerializer
+
+    def delete(self, request, pk, format=None):
+
+        for detalle_orden in DetalleOrden.objects.filter(orden=pk):
+            detalle_orden.producto.stock += detalle_orden.cantidad
+            detalle_orden.producto.save()
+
+        self.get_object().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['get'])
     def get_total_usd(self, request, pk=None):

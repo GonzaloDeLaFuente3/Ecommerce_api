@@ -12,10 +12,8 @@ class Orden(models.Model):
 
     def get_total(self):
         total = 0.0
-        detalle_ordenes = DetalleOrden.objects.all()
-        for detalle_orden in detalle_ordenes:
-            if detalle_orden.orden == self:
-                total += detalle_orden.producto.precio*detalle_orden.cantidad
+        for detalle_orden in DetalleOrden.objects.filter(orden=self):
+            total += detalle_orden.producto.precio * detalle_orden.cantidad
 
         return total
 

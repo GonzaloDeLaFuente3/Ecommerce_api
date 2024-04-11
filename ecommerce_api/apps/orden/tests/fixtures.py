@@ -25,3 +25,6 @@ def crear_productos():
     producto2 = crear_producto("Helado",500,900)
     return producto1, producto2
 
+@pytest.fixture
+def producto_cargado():
+    return crear_producto('Almendras', 300, 1000)

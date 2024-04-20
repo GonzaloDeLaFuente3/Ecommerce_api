@@ -1,4 +1,3 @@
-
 from rest_framework.mixins import CreateModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from .models import Orden, DetalleOrden

@@ -9,11 +9,16 @@ def test_crear_producto(producto_cargado):
     assert producto_cargado.stock == 1000
 
 @pytest.mark.django_db
-def test_actualizacion_producto(producto_cargado):
+def test_actualizacion_nombre_producto(producto_cargado):
         producto_cargado.nombre = "Nueces"
         producto_cargado.save()
         assert producto_cargado.nombre == "Nueces"
         
+@pytest.mark.django_db
+def test_actualizacion_stock_producto(producto_cargado):
+    producto_cargado.stock -= 100
+    producto_cargado.save()
+    assert producto_cargado.stock == 900
 
 @pytest.mark.django_db
 def test_eliminacion_producto(producto_cargado):

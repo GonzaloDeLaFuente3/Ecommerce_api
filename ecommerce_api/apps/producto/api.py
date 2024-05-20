@@ -27,9 +27,3 @@ class ProductoViewSet(viewsets.ModelViewSet):
             serializer = ProductoUpdateSerializer
 
         return serializer
-
-
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_class = ProductoFilter
-    # ordering_fields = ['dni', 'nombre_completo']
-    # lookup_field = 'uuid'

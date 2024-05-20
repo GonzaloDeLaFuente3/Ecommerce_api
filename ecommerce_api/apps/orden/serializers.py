@@ -12,6 +12,11 @@ class OrdenSerializer(serializers.ModelSerializer):
         return obj.get_total()
 
 class DetalleOrdenSerializer(serializers.ModelSerializer):
+    total_detalle = serializers.SerializerMethodField(method_name='obtener_total_detalle')
     class Meta:
         model = DetalleOrden
         fields = '__all__'
+        read_only_fields = ['total_detalle']
+
+    def obtener_total_detalle(self, obj):
+        return obj.get_total_detalle()

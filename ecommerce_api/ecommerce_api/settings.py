@@ -131,7 +131,7 @@ REST_FRAMEWORK = {
     'rest_framework.renderers.BrowsableAPIRenderer'],
 }
 
-try:
-    from .configuraciones_locales import *
-except ImportError:
-    raise Exception("El archivo de configuraciones locales es requerido para ejecutar este proyecto")
+# try:
+#     from .configuraciones_locales import *
+# except ImportError:
+#     raise Exception("El archivo de configuraciones locales es requerido para ejecutar este proyecto")
